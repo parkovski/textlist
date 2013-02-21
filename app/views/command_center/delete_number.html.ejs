@@ -1,0 +1,4 @@
+<% layout('/layout') -%>
+<p>You are about to delete a number. This action cannot be undone. Are you sure?</p>
+<p><form action="/command_center/numbers" method="GET"><input type="submit" value="no"></form>
+<form action="/command_center/numbers/<%=id%>/delete" method="POST"><input type="submit" value="yes"></form></p>

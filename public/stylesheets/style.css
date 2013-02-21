@@ -1,0 +1,102 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6, form {
+  margin: 0;
+  padding: 0;
+}
+
+#floater {
+  position: relative;
+  float: left;
+  height: 50%;
+  margin-bottom: -200px;
+  width: 1px;
+}
+
+#centered {
+  position: relative;
+  clear: left;
+  height: 400px;
+  width: 80%;
+  max-width: 800px;
+  min-width: 400px;
+  margin: 0 auto;
+  background: #fff;
+  border: 4px solid #666;
+}
+
+#side {
+  position: absolute;
+  width: 30%;
+  padding-top: 20px;
+  margin-top: 10px;
+}
+
+#side h1 {
+  margin-left: 10px;
+  text-align: center;
+  visibility: hidden;
+}
+
+#nav {
+  padding: 0;
+  margin: 0;
+  margin-left: 10px;
+  margin-top: 1em;
+  list-style: none;
+  text-indent: 0;
+}
+
+#nav li a {
+  display: block;
+  background-color: #e8e8e8;
+  padding: 7px;
+  margin: 0;
+  text-decoration: none;
+  color: #000;
+  border-bottom: 1px solid #bbb;
+  text-align: right;
+}
+
+#nav li a::after {
+  content: '>>';
+  color: #aaa;
+  font-weight: bold;
+  display: inline;
+  float: right;
+  margin: 0 2px 0 5px;
+}
+
+#nav li a:hover, #nav li a:focus {
+  background: #f8f8f8;
+  border-bottom-color: #777;
+}
+
+#nav li a:hover::after {
+  margin: 0 0 0 7px; color:#f93;
+}
+
+#nav li a:active {
+  padding: 8px 7px 6px 7px;
+}
+
+#content {
+  position: absolute;
+  left: 30%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+  height: 340px;
+  padding: 20px;
+  margin: 10px;
+}
+
+a {
+  color: #00B7FF;
+}

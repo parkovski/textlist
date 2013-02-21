@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <div id="floater"></div>
+    <div id="centered">
+      <% if (typeof sidebar != 'undefined') { %>
+        <div id="side">
+          <h1>Buttons!</h1>
+          <%- partial(sidebar) -%>
+        </div>
+        <style type="text/css">
+          #content {
+            border-left: 4px #666 solid;
+          }
+        </style>
+      <% } %>
+      <div id="content">
+        <h1><%= title %></h1>
+        <%- body -%>
+      </div>
+    </div>
+  </body>
+</html>

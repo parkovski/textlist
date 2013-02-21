@@ -1,0 +1,6 @@
+<% layout('/layout'); -%>
+<p><a href="/command_center/numbers/new">Create a new number</a></p>
+<% for (var i = 0; i < people.length; ++i) { %>
+<p><%= people[i].firstname + ' ' + people[i].lastname + ' - ' + people[i].phonenr %>
+(<a href="/command_center/numbers/<%= people[i].id %>/delete">delete</a>)</p>
+<% } %>

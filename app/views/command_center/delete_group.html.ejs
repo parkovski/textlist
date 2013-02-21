@@ -1,0 +1,4 @@
+<% layout('/layout') -%>
+<p>You are about to delete a group. This action cannot be undone. Are you sure?</p>
+<p><form action="/command_center/groups" method="GET"><input type="submit" value="no"></form>
+<form action="/command_center/groups/<%=id%>/delete" method="POST"><input type="submit" value="yes"></form></p>
