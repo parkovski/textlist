@@ -18,25 +18,27 @@ module.exports = function routes() {
   this.match('command_center/error', 'command_center#error');
   this.match('command_center/text/new', 'command_center#new_text');
   this.match('command_center/text/send', 'command_center#send_text',
-      { via: 'POST' });
+    { via: 'POST' });
   this.match('command_center/call/new', 'command_center#new_call');
   this.match('command_center/call/send', 'command_center#send_call',
-      { via: 'POST' });
+    { via: 'POST' });
   this.match('command_center/schedule/new', 'command_center#new_schedule');
   this.match('command_center/schedule', 'command_center#schedule');
 
   this.match('command_center/numbers', 'command_center#numbers');
   this.match('command_center/numbers/new', 'command_center#newNumber',
-      { via: ['GET', 'POST'] });
+    { via: ['GET', 'POST'] });
   this.match('command_center/numbers/:id/delete',
-      'command_center#deleteNumber', { via: ['GET', 'POST'] });
+    'command_center#deleteNumber', { via: ['GET', 'POST'] });
 
   this.match('command_center/groups', 'command_center#groups');
   this.match('command_center/groups/new', 'command_center#newGroup',
     { via: ['GET', 'POST'] });
   this.match('command_center/groups/:id', 'command_center#editGroup');
-  this.match('command_center/groups/:id/save', 'command_center#saveGroup',
-    { via: 'POST' });
+  this.match('command_center/groups/:gid/add/:uid',
+    'command_center#addToGroup'); // over GET #yolo #fuckconventions
+  this.match('command_center/groups/:gid/remove/:uid',
+    'command_center#removeFromGroup'); // same
   this.match('command_center/groups/:id/delete',
     'command_center#deleteGroup', { via: ['GET', 'POST'] });
 

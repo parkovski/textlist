@@ -206,25 +206,99 @@ CommandCenterController.newGroup = function() {
 
 CommandCenterController.editGroup = function() {
   var self = this;
+  var id = this.param('id');
+  if (typeof id == 'undefined') {
+    this.redirect('/command_center/groups');
+    return;
+  }
   getPgConn(function(err, client) {
     if (err) {
       self.redirect('/command_center/error?info=' + err);
     } else {
-      client.query('SELECT * FROM people;', function(err, result) {
+      client.query('SELECT name FROM groups WHERE id=$1', [id],
+        function(err, grpresult) {
+          if (grpresult && grpresult.rows.length == 0) {
+            err = 'group ' + id + ' does not exist';
+          }
+          if (err) {
+            self.redirect('/command_center/error?info=' + err);
+          } else {
+            client.query('SELECT * FROM people;', function(err, result) {
+              if (err) {
+                self.redirect('/command_center/error?info=' + err);
+              } else {
+                client.query('SELECT * FROM group_members;',
+                  function(err, result2) {
+                    if (err) {
+                      self.redirect('/command_center/error?info=' + err);
+                    } else {
+                      var members = [];
+                      var nonmembers = [];
+                      var uidsInGroup = {};
+                      for (var i = 0; i < result2.rows.length; ++i) {
+                        if (result2.rows[i].group_id == id) {
+                          uidsInGroup[result2.rows[i].person_id] = true;
+                        }
+                      }
+                      for (i = 0; i < result.rows.length; ++i) {
+                        if (uidsInGroup.hasOwnProperty(result.rows[i].id)) {
+                          members.push(result.rows[i]);
+                        } else {
+                          nonmembers.push(result.rows[i]);
+                        }
+                      }
+                      self.title = 'View/edit group "' +
+                        grpresult.rows[0].name + '"';
+                      self.id = id;
+                      self.members = members;
+                      self.nonmembers = nonmembers;
+                      self.render();
+                    }
+                  });
+              }
+            });
+          }
+        });
+    }
+  });
+}
+
+CommandCenterController.addToGroup = function() {
+  var gid = this.param('gid');
+  var uid = this.param('uid');
+  var self = this;
+  getPgConn(function(err, client) {
+    if (err) {
+      self.redirect('/command_center/error?info=' + err);
+    } else {
+      client.query('INSERT INTO group_members (group_id, person_id) SELECT $1, $2 WHERE NOT EXISTS (SELECT * FROM group_members WHERE group_id=$1 AND person_id=$2);', [gid, uid], function(err, result) {
         if (err) {
           self.redirect('/command_center/error?info=' + err);
         } else {
-          self.title = 'View/edit group';
-          self.id = self.param('id');
-          self.people = result.rows;
-          self.render();
+          self.redirect('/command_center/groups/' + gid);
         }
       });
     }
   });
 }
 
-CommandCenterController.saveGroup = function() {
+CommandCenterController.removeFromGroup = function() {
+  var gid = this.param('gid');
+  var uid = this.param('uid');
+  var self = this;
+  getPgConn(function(err, client) {
+    if (err) {
+      self.redirect('/command_center/error?info=' + err);
+    } else {
+      client.query('DELETE FROM group_members WHERE group_id=$1 AND person_id=$2;', [gid, uid], function(err, result) {
+        if (err) {
+          self.redirect('/command_center/error?info=' + err);
+        } else {
+          self.redirect('/command_center/groups/' + gid);
+        }
+      });
+    }
+  });
 }
 
 CommandCenterController.deleteGroup = function() {
