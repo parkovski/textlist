@@ -126,6 +126,7 @@ CommandCenterController.newNumber = function() {
   }
 }
 
+// TODO: delete from associations
 CommandCenterController.deleteNumber = function() {
   if (this.req.method.toUpperCase() == 'GET') {
     this.title = 'Delete number';
@@ -301,6 +302,7 @@ CommandCenterController.removeFromGroup = function() {
   });
 }
 
+// TODO: delete from associations too
 CommandCenterController.deleteGroup = function() {
   if (this.req.method.toUpperCase() == 'GET') {
     this.title = 'Delete group';
