@@ -283,7 +283,7 @@ CommandCenterController.editGroup = function() {
       async.map([q1, q2], function(item, callback) {
         client.query(item, [id], callback);
       }, function(err, results) {
-        if (results[0].rows.length == 0) {
+        if (results[0] && results[0].rows.length == 0) {
           err = 'group ' + id + ' does not exist';
         }
         if (err) {
