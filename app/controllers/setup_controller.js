@@ -35,9 +35,10 @@ SetupController.finish = function() {
   var dbname = this.param('dbname');
   var twiliokey = this.param('twiliokey');
   var twiliosecret = this.param('twiliosecret');
+  var twiliophone = this.param('twiliophone');
 
   if (!(dbhost && dbuser && dbpass && dbname &&
-        twiliokey && twiliosecret)) {
+        twiliokey && twiliosecret && twiliophone)) {
     this.redirect('/setup?sure');
     return;
   }
@@ -49,7 +50,8 @@ SetupController.finish = function() {
     '  dbpass: \"' + dbpass + '\",\n' +
     '  dbname: \"' + dbname + '\",\n' +
     '  twiliokey: \"' + twiliokey + '\",\n' +
-    '  twiliosecret: \"' + twiliosecret + '\"\n' +
+    '  twiliosecret: \"' + twiliosecret + '\",\n' +
+    '  twiliophone: \"' + twiliophone + '\"\n' +
     '};\n' +
     '\n' +
     'module.exports = settings;';
