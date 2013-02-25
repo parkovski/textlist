@@ -28,6 +28,8 @@ module.exports = function routes() {
   this.match('command_center/numbers', 'command_center#numbers');
   this.match('command_center/numbers/new', 'command_center#newNumber',
     { via: ['GET', 'POST'] });
+  this.match('command_center/numbers/:id/edit', 'command_center#editNumber',
+    { via: ['GET', 'POST'] });
   this.match('command_center/numbers/:id/delete',
     'command_center#deleteNumber', { via: ['GET', 'POST'] });
 

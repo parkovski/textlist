@@ -8,7 +8,8 @@
     "connect-powered-by": "0.1.x",
     "ejs": "0.8.x",
     "ejs-locals": "~1.0.2",
-    "pg": "~0.12.3"
+    "pg": "~0.12.3",
+    "async": "~0.2.5"
   },
   "engines": {
     "node": "0.8.x",

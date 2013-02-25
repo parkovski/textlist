@@ -64,12 +64,14 @@ SetupController.finish = function() {
 }
 
 SetupController.before('*', function(next) {
-  if (!this.req.session.valid) {
-    this.redirect('/');
-    return;
-  }
-
-  next();
+  var self = this;
+  fs.exists('../../config/settings.js', function(exists) {
+    if (!exists || self.req.session.valid) {
+      next();
+    } else {
+      self.redirect('/');
+    }
+  });
 });
 
 module.exports = SetupController;
