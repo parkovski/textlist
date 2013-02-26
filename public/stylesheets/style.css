@@ -28,6 +28,9 @@ h1, h2, h3, h4, h5, h6, form {
   margin: 0 auto;
   background: #fff;
   border: 4px solid #666;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
 }
 
 #side {
@@ -99,4 +102,43 @@ h1, h2, h3, h4, h5, h6, form {
 
 a {
   color: #00B7FF;
+}
+
+.action {
+  cursor: pointer;
+}
+
+textarea, .thin-border {
+  border: 1px #000 solid;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+  padding: 3px;
+  width: 100%;
+}
+
+textarea {
+  height: 6em;
+}
+
+.margin {
+  margin: 1em 0;
+}
+
+.margin-top {
+  margin-top: 1em;
+}
+
+.right-half {
+  float: right;
+  width: 50%;
+  border-left: 1px solid #000;
+  margin-left: -10px;
+  padding-left: 10px;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #000;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
 }

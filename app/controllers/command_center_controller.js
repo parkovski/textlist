@@ -59,6 +59,7 @@ CommandCenterController.error = function() {
 CommandCenterController.newText = function() {
   this.title = 'New text';
   this.type = 'text';
+  this.jquery = true;
   this.render('new_message');
 }
 
@@ -68,6 +69,7 @@ CommandCenterController.sendText = function() {
 CommandCenterController.newCall = function() {
   this.title = 'New call';
   this.type = 'call';
+  this.jquery = true;
   this.render('new_message');
 }
 
