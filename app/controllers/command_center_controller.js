@@ -503,4 +503,11 @@ CommandCenterController.before('*', function(next) {
   next();
 });
 
+CommandCenterController.after('*', function(next) {
+  if (pgClient) {
+    pgClient.end();
+  }
+  next();
+});
+
 module.exports = CommandCenterController;
