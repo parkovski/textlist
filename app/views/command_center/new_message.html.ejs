@@ -4,9 +4,20 @@
   <div class="margin-top" id="recipient-list">
     <div class="border-bottom">Oh no, you have no recipients.
       This means your message won't be sent anywhere.
-      Maybe you're retarded?</div>
-    <div class="right-half bb">People click dat shit to add</div>
-    <div class="bb">Groups click dat shit to add</div>
+      Maybe you're retarded?
+    </div>
+    <div class="right-half">
+      People click dat shit to add<br>
+      <% for (var i = 0; i < people.length; ++i) { -%>
+        - <%= people[i].firstname %> <% people[i].lastname %><br>
+      <% } -%>
+    </div>
+    <div>
+      Groups click dat shit to add<br>
+      <% for (var i = 0; i < groups.length; ++i) { -%>
+        - <%= groups[i].name %><br>
+      <% } -%>
+    </div>
   </div>
 </div>
 <div><form method="post" action="/command_center/<%= type %>/send">

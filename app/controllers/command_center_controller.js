@@ -56,21 +56,38 @@ CommandCenterController.error = function() {
   this.render();
 }
 
+CommandCenterController.newMessage = function() {
+  var self = this;
+  getPgConn(function(err, client) {
+    var q1 = 'SELECT * FROM groups;';
+    var q2 = 'SELECT * FROM people;';
+    async.map([q1, q2], function(item, callback) {
+      client.query(item, callback);
+    }, function(err, results) {
+      if (err) {
+        self.redirect('/command_center/error?info=' + err);
+      } else {
+        self.title = 'New ' + self.type;
+        self.jquery = true;
+        self.groups = results[0].rows;
+        self.people = results[1].rows;
+        self.render('new_message');
+      }
+    });
+  });
+}
+
 CommandCenterController.newText = function() {
-  this.title = 'New text';
   this.type = 'text';
-  this.jquery = true;
-  this.render('new_message');
+  this.newMessage();
 }
 
 CommandCenterController.sendText = function() {
 }
 
 CommandCenterController.newCall = function() {
-  this.title = 'New call';
   this.type = 'call';
-  this.jquery = true;
-  this.render('new_message');
+  this.newMessage();
 }
 
 CommandCenterController.sendCall = function() {
