@@ -14,14 +14,14 @@ h1, h2, h3, h4, h5, h6, form {
   position: relative;
   float: left;
   height: 50%;
-  margin-bottom: -200px;
+  margin-bottom: -250px;
   width: 1px;
 }
 
 #centered {
   position: relative;
   clear: left;
-  height: 400px;
+  height: 500px;
   width: 80%;
   max-width: 800px;
   min-width: 400px;
@@ -95,7 +95,7 @@ h1, h2, h3, h4, h5, h6, form {
   top: 0;
   bottom: 0;
   overflow: auto;
-  height: 340px;
+  height: 440px;
   padding: 20px;
   margin: 10px;
 }
@@ -126,7 +126,7 @@ textarea {
 }
 
 .margin-top {
-  margin-top: 1em;
+  margin-top: 0.5em;
   overflow: hidden;
 }
 
@@ -134,8 +134,20 @@ textarea {
   float: right;
   width: 50%;
   border-left: 1px solid #000;
-  margin-left: -10px;
-  padding-left: 10px;
+  margin-left: -3px;
+  padding-left: 3px;
+}
+
+.left-half {
+  margin-right: 50%;
+  padding-right: 6px;
+}
+
+#recipient-list h5 {
+  border-bottom: 1px solid #000;
+  text-align: center;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .border-bottom {
@@ -143,3 +155,31 @@ textarea {
   padding-bottom: 5px;
   margin-bottom: 5px;
 }
+
+p.recip {
+  margin-top: 0;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+p.recip::before {
+  font-weight: bold;
+  color: #aaa;
+}
+
+p.recip.out::before {
+  content: "+ ";
+}
+
+p.recip.in::before {
+  content: "\2013 "; /* ndash */
+}
+
+p.recip.out {
+  margin-top: 0.2em;
+}
+
+p.recip:hover {
+  background-color: #ddd;
+}
+

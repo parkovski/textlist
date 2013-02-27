@@ -2,27 +2,30 @@
 <div class="margin thin-border">
   <h3 class="action" id="expand-recipient-list">&#9660; Recipients</h3>
   <div class="margin-top" id="recipient-list">
-    <div class="border-bottom">Oh no, you have no recipients.
-      This means your message won't be sent anywhere.
-      Maybe you're retarded?
+    <div class="border-bottom" id="recipients">
+      Click a name to add a recipient.
     </div>
     <div class="right-half">
-      People click dat shit to add<br>
+      <h5>People</h5>
       <% for (var i = 0; i < people.length; ++i) { -%>
-        - <%= people[i].firstname %> <% people[i].lastname %><br>
+        <p class="recip out" id="rperson<%= people[i].id %>" data-id="<%= people[i].id %>" data-type="person">
+          <%= people[i].firstname %> <%= people[i].lastname %>
+        </p>
       <% } -%>
     </div>
-    <div>
-      Groups click dat shit to add<br>
+    <div class="left-half">
+      <h5>Groups</h5>
       <% for (var i = 0; i < groups.length; ++i) { -%>
-        - <%= groups[i].name %><br>
+        <p class="recip out" id="rgroup<%= groups[i].id %>" data-id="<%= groups[i].id %>" data-type="group">
+          <%= groups[i].name %>
+        </p>
       <% } -%>
     </div>
   </div>
 </div>
-<div><form method="post" action="/command_center/<%= type %>/send">
-  <textarea>Holy fuck you can send people this text!</textarea>
-  <input type="submit"></input>
+<div><form method="post" action="/command_center/<%= type %>/send" id="form">
+  <textarea placeholder="Type your message here"></textarea>
+  <input type="submit" value="Send <%= type %>!"></input>
 </form></div>
 <script>
   $(function() {
@@ -37,7 +40,39 @@
       }
     });
 
+    $('p.recip.out').click(function() {
+      var recips = $('#recipients');
+      var form = $('#form');
+      var me = $(this);
+      me.hide();
+      var p = $('<p/>', {
+        class: 'recip in',
+        text: me.text(),
+        dataId: me.data('id'),
+        dataType: me.data('type')
+      });
+      p.click(function() {
+        $('#' + me.data('type') + me.data('id')).remove();
+        me.show();
+        p.remove();
+        if (!$('#recipients p').length) {
+          $('#recipients').text('Click a name to add a recipient.');
+        }
+      });
+      if (!$('#recipients p').length) {
+        $('#recipients').text('');
+      }
+      recips.append(p);
+      form.append($('<input/>', {
+        type: 'hidden',
+        id: me.data('type') + me.data('id'),
+        name: 'recipient',
+        value: me.data('type') + me.data('id')
+      }));
+    });
+
     // hide the recipient list by default
+    return;
     $('#expand-recipient-list').html('&#9658; Recipients');
     $('#recipient-list').hide();
   });

@@ -77,12 +77,97 @@ CommandCenterController.newMessage = function() {
   });
 }
 
+CommandCenterController.sendMessage = function() {
+  var self = this;
+  getPgConn(function(err, client) {
+    if (err) {
+      self.redirect('/command_center/error?info=' + err);
+    } else {
+      var people = [];
+      var groups = [];
+      var recips = self.param('recipient') || [];
+      if (typeof recips == 'string') {
+        if (recips.length) {
+          recips = recips.split(',');
+        } else {
+          recips = [];
+        }
+      }
+      for (var i = 0; i < recips.length; ++i) {
+        var id = NaN;
+        var arr;
+        if (recips[i].substring(0, 6) == 'person' && recips[i].length > 6) {
+          id = parseInt(recips[i].substring(6), 10);
+          arr = people;
+        } else if (recips[i].substring(0, 5) == 'group' && recips[i].length > 5) {
+          id = parseInt(recips[i].substring(5), 10);
+          arr = groups;
+        }
+        if (!isNaN(id)) {
+          arr.push(id);
+        }
+      }
+      var groupQuery = 'SELECT phonenr FROM people WHERE id IN' +
+        ' (SELECT person_id FROM group_members WHERE group_id IN (';
+      var peopleQuery = 'SELECT phonenr FROM people WHERE id IN (';
+      var sqlId = 1;
+      for (var i = 0; i < groups.length; ++i) {
+        groupQuery += '$'+sqlId;
+        ++sqlId;
+        if (i < groups.length - 1) {
+          groupQuery += ', ';
+        } else {
+          groupQuery += '))';
+        }
+      }
+      for (var i = 0; i < people.length; ++i) {
+        peopleQuery += '$'+sqlId;
+        ++sqlId;
+        if (i < people.length - 1) {
+          peopleQuery += ', ';
+        } else {
+          peopleQuery += ')';
+        }
+      }
+      var allIds = groups.concat(people);
+      if (allIds.length == 0) {
+        self.redirect('/command_center/error?info=no recipients selected');
+      } else {
+        var query;
+        if (groups.length) {
+          query = groupQuery;
+          if (people.length) {
+            query += '\nUNION\n' + peopleQuery;
+          }
+        } else {
+          query = peopleQuery;
+        }
+        query += ';';
+        client.query(query, allIds, function(err, result) {
+          if (err) {
+            self.redirect('/command_center/error?info=' + err);
+          } else {
+            // do the twilio call...
+            var nrs = [];
+            for (var i = 0; i < result.rows.length; ++i) {
+              nrs.push(result.rows[i].phonenr);
+            }
+            self.redirect('/command_center/error?info=' + nrs);
+          }
+        });
+      }
+    }
+  });
+}
+
 CommandCenterController.newText = function() {
   this.type = 'text';
   this.newMessage();
 }
 
 CommandCenterController.sendText = function() {
+  this.type = 'text';
+  this.sendMessage();
 }
 
 CommandCenterController.newCall = function() {
@@ -91,6 +176,8 @@ CommandCenterController.newCall = function() {
 }
 
 CommandCenterController.sendCall = function() {
+  this.type = 'call';
+  this.sendMessage();
 }
 
 CommandCenterController.schedule = function() {
