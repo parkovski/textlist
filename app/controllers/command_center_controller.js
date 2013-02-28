@@ -9,8 +9,6 @@ try {
 } catch (ex) {
 }
 
-var pgClient = null;
-
 // pass function(err, client)
 function getPgConn(callback) {
   if (!settings) {
@@ -18,15 +16,16 @@ function getPgConn(callback) {
     return;
   }
 
-  if (!pgClient) {
-    var client = new pg.Client('tcp://' + settings.dbuser + ':' +
-      settings.dbpass + '@' + settings.dbhost + '/' + settings.dbname);
-    client.connect(function(err){
-      callback(err, client);
-    });
-  } else {
-    callback(null, pgClient);
-  }
+  var connStr = 'tcp://' + settings.dbuser + ':' +
+    settings.dbpass + '@' + settings.dbhost + '/' + settings.dbname;
+
+  pg.connect(connStr, function(err, client, done) {
+    callback(err, client);
+    // the new pg lib requires this, but the old one crashes on it :(
+    if (done) {
+      done();
+    }
+  });
 }
 
 var CommandCenterController = new Controller();
@@ -500,13 +499,6 @@ CommandCenterController.before('*', function(next) {
   //}
 
   this.sidebar = 'command_center/sidebar';
-  next();
-});
-
-CommandCenterController.after('*', function(next) {
-  if (pgClient) {
-    pgClient.end();
-  }
   next();
 });
 

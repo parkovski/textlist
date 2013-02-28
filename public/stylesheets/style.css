@@ -155,8 +155,12 @@ input[type="button"]:hover, input[type="submit"]:hover {
 }
 
 .margin-top {
-  margin-top: 0.5em;
   overflow: hidden;
+  position: relative;
+}
+
+.real-margin-top {
+  margin-bottom: 0.5em;
 }
 
 .right-half {
@@ -169,7 +173,7 @@ input[type="button"]:hover, input[type="submit"]:hover {
 
 .left-half {
   margin-right: 50%;
-  padding-right: 6px;
+  padding-right: 7px; /* 3px on each side, plus 1px for the line */
 }
 
 #recipient-list h5 {
@@ -186,7 +190,7 @@ input[type="button"]:hover, input[type="submit"]:hover {
 }
 
 p.recip {
-  margin-top: 0;
+  margin-top: 0.2em;
   margin-bottom: 0;
   cursor: pointer;
 }
@@ -202,10 +206,6 @@ p.recip.out::before {
 
 p.recip.in::before {
   content: "\2013 "; /* ndash */
-}
-
-p.recip.out {
-  margin-top: 0.2em;
 }
 
 p.recip:hover {

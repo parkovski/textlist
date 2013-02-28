@@ -2,6 +2,7 @@
 <div class="margin thin-border">
   <h3 class="action" id="expand-recipient-list">&#9660; Recipients</h3>
   <div class="margin-top" id="recipient-list">
+    <div class="real-margin-top"></div>
     <div class="border-bottom" id="recipients">
       Click a name to add a recipient.
     </div>
@@ -48,8 +49,8 @@
       var p = $('<p/>', {
         class: 'recip in',
         text: me.text(),
-        dataId: me.data('id'),
-        dataType: me.data('type')
+        'data-id': me.data('id'),
+        'data-type': me.data('type')
       });
       p.click(function() {
         $('#' + me.data('type') + me.data('id')).remove();
