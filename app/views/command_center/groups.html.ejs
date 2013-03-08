@@ -1,5 +1,5 @@
 <% layout('/layout') -%>
-<p><a href="/command_center/groups/new">Create a new group</a></p>
+<p class="topalign"><a href="/command_center/groups/new">Create a new group</a></p>
 <% for (var i = 0; i < groups.length; ++i) { %>
 <p><a href="/command_center/groups/<%= groups[i].id %>"><%= groups[i].name %></a> (<a href="/command_center/groups/<%= groups[i].id %>/delete">delete</a>)</p>
 <% } %>

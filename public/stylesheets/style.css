@@ -112,7 +112,7 @@ a:hover {
   cursor: pointer;
 }
 
-textarea, .thin-border, input {
+textarea, .thin-border, input, select {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -121,6 +121,7 @@ textarea, .thin-border, input {
 
 textarea, input {
   border: 1px #bbb solid;
+  margin: 0;
 }
 
 .thin-border {
@@ -166,6 +167,7 @@ input[type="button"]:hover, input[type="submit"]:hover {
 .right-half {
   float: right;
   width: 50%;
+  height: auto;
   border-left: 1px solid #000;
   margin-left: -3px;
   padding-left: 3px;
@@ -174,6 +176,18 @@ input[type="button"]:hover, input[type="submit"]:hover {
 .left-half {
   margin-right: 50%;
   padding-right: 7px; /* 3px on each side, plus 1px for the line */
+  overflow-x: hidden;
+}
+
+.jjjjjjj {
+  margin: 1em 0;
+  padding-top: 2px;
+}
+
+.ifuckinghatehtml {
+  float: left;
+  width: 140px;
+  padding-top: 5px;
 }
 
 #recipient-list h5 {
@@ -183,10 +197,30 @@ input[type="button"]:hover, input[type="submit"]:hover {
   margin-bottom: 5px;
 }
 
-.border-bottom {
-  border-bottom: 1px solid #000;
-  padding-bottom: 5px;
-  margin-bottom: 5px;
+#recipient-selector {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px solid #000;
+}
+
+.topalign {
+  padding-top: 7px;
+}
+
+.formleft {
+  width: 140px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+h3.topalign {
+  padding-top: 3px;
+}
+
+h3.likep {
+  margin: 1em 0;
 }
 
 p.recip {

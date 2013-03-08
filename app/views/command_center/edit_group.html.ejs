@@ -1,10 +1,10 @@
 <% layout('/layout'); -%>
-<p><h3>Members</h3></p>
+<h3 class="likep topalign">Members</h3>
 <% for (var i = 0; i < members.length; ++i) { %>
 <p><%= members[i].firstname + ' ' + members[i].lastname + ' - ' + members[i].phonenr %>
 (<a href="/command_center/groups/<%=id%>/remove/<%=members[i].id%>">remove</a>)</p>
 <% } %>
-<p><h3>Non-members</h3></p>
+<h3 class="likep">Non-members</h3>
 <% for (i = 0; i < nonmembers.length; ++i) { %>
 <p><%= nonmembers[i].firstname + ' ' + nonmembers[i].lastname + ' - ' + nonmembers[i].phonenr %>
 (<a href="/command_center/groups/<%=id%>/add/<%=nonmembers[i].id%>">add</a>)</p>
