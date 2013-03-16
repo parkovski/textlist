@@ -1,2 +1,8 @@
 <% layout('/layout') -%>
-<p>You are looking at the schedule!</p>
+<p class="topalign"><a href="/command_center/schedule/new">New scheduled task</a></p>
+<% if (typeof tasks != 'undefined') { for (var i = 0; i < tasks.length; ++i) { %>
+<p>
+  <%= tasks[i].description + ' - ' + tasks[i].time %>
+  (<a href="/command_center/schedule/<%= tasks[i].id %>/delete">delete</a>)
+</p>
+<% } } %>

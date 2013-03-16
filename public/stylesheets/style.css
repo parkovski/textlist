@@ -35,7 +35,7 @@ h1, h2, h3, h4, h5, h6, form {
 
 #side {
   position: absolute;
-  width: 30%;
+  width: 160px;
   padding-top: 20px;
   margin-top: 10px;
 }
@@ -89,7 +89,7 @@ h1, h2, h3, h4, h5, h6, form {
 
 #content {
   position: absolute;
-  left: 30%;
+  left: 160px;
   right: 0;
   top: 0;
   bottom: 0;
