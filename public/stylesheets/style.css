@@ -119,9 +119,10 @@ textarea, .thin-border, input, select {
   padding: 3px;
 }
 
-textarea, input {
-  border: 1px #bbb solid;
+textarea, input[type="button"], input[type="submit"],
+          input[type="text"], input[type="password"] {
   margin: 0;
+  border: 1px #bbb solid;
 }
 
 .thin-border {
@@ -176,6 +177,18 @@ input[type="button"]:hover, input[type="submit"]:hover {
 .left-half {
   margin-right: 50%;
   padding-right: 7px; /* 3px on each side, plus 1px for the line */
+  overflow-x: hidden;
+}
+
+.right-half-borderless {
+  float: right;
+  width: 50%;
+  height: auto;
+  position: relative;
+}
+
+.left-half-borderless {
+  margin-right: 50%;
   overflow-x: hidden;
 }
 

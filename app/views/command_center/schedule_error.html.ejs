@@ -1,0 +1,6 @@
+<% layout('/layout') -%>
+<p class="topalign">Your task could not be created.</p>
+<p><a href="<%= redirurl %>">Go back</a></p>
+<% if (info) { %>
+  <p>Additional info: <%= info %></p>
+<% } %>

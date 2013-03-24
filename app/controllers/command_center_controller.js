@@ -1,7 +1,8 @@
 var locomotive = require('locomotive')
   , Controller = locomotive.Controller
   , pg = require('pg')
-  , async = require('async');
+  , async = require('async')
+  , time = require('time');
 
 var settings = null;
 try {
@@ -66,7 +67,14 @@ CommandCenterController.newMessage = function() {
       if (err) {
         self.redirect('/command_center/error?info=' + err);
       } else {
-        self.title = 'New ' + self.type;
+        if (!self.title) {
+          self.title = 'New ' + self.type;
+        }
+        if (self.type == 'schedule') {
+          self.submiturl = 'schedule/submit';
+        } else {
+          self.submiturl = self.type + '/send';
+        }
         self.jquery = true;
         self.groups = results[0].rows;
         self.people = results[1].rows;
@@ -85,6 +93,10 @@ CommandCenterController.sendMessage = function() {
       var people = [];
       var groups = [];
       var recips = self.param('recipient') || [];
+      var message = self.param('message');
+      if (!message) {
+        self.redirect('/command_center/error?info=no message was specified');
+      }
       if (typeof recips == 'string') {
         if (recips.length) {
           recips = recips.split(',');
@@ -146,12 +158,13 @@ CommandCenterController.sendMessage = function() {
           if (err) {
             self.redirect('/command_center/error?info=' + err);
           } else {
-            // do the twilio call...
+            // TODO: do the twilio call...
             var nrs = [];
             for (var i = 0; i < result.rows.length; ++i) {
               nrs.push(result.rows[i].phonenr);
             }
-            self.redirect('/command_center/error?info=' + nrs);
+            self._doTwilioCall(message, nrs);
+            self.redirect('/command_center');
           }
         });
       }
@@ -184,9 +197,226 @@ CommandCenterController.schedule = function() {
   this.render();
 }
 
+CommandCenterController._getScheduleVars = function() {
+  return {
+    recipient: this.param('recipient'),
+    message: this.param('message'),
+    day0: this.param('day0'),
+    day1: this.param('day1'),
+    day2: this.param('day2'),
+    day3: this.param('day3'),
+    day4: this.param('day4'),
+    day5: this.param('day5'),
+    day6: this.param('day6'),
+    day7: this.param('day7'),
+    time: this.param('time'),
+    msgtype: this.param('msgtype')
+  };
+}
+
+CommandCenterController._getRecipientArrays = function(recips) {
+  if (!recips) {
+    return { people: [], groups: [] };
+  }
+  var all = recips.split(',');
+  var people = [];
+  var groups = [];
+  for (var i = 0; i < all.length; ++i) {
+    var id = NaN;
+    if (all[i].substring(0, 5) == 'group' && all[i].length > 5) {
+      id = parseInt(all[i].substring(5), 10);
+      if (!isNaN(id)) {
+        groups.push(id);
+      }
+    } else if (all[i].substring(0, 6) == 'person' && all[i].length > 6) {
+      id = parseInt(all[i].substring(6), 10);
+      if (!isNaN(id)) {
+        people.push(id);
+      }
+    }
+  }
+  return { people: people, groups: groups };
+}
+
+CommandCenterController._getScheduleVarString = function(vars) {
+  var url = '';
+  for (var v in vars) {
+    if (vars.hasOwnProperty(v) && typeof vars[v] != 'undefined') {
+      url += '&' + v + '=' + encodeURIComponent(vars[v]);
+    }
+  }
+  return url.substring(1);
+}
+
+// The vars parameter here is not the same as the one returned by
+// _getScheduleVars. See usage in newSchedule.
+CommandCenterController._addCronJob = function(vars) {
+  var now = new Date();
+  var daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  var thisYear = now.getYear();
+  var thisMonth = now.getMonth();
+  var today = now.getDate();
+  var self = this;
+
+  // leap year
+  if (thisYear % 4 == 0 && thisYear % 100 != 0) {
+    daysInMonths[1] = 29;
+  }
+
+  getPgConn(function(err, client) {
+    if (err) {
+      return err;
+    } else {
+      // this stuff only works because we aren't looking more than
+      // a week in advance. time is hard :(.
+      for (var i = 0; i < vars.days.length; ++i) {
+        var targetDay = today + vars.days[i];
+        var targetMonth = thisMonth;
+        var targetYear = thisYear;
+        if (targetDay > daysInMonths[thisMonth]) {
+          targetDay -= daysInMonths[thisMonth];
+          ++targetMonth;
+          if (targetMonth == 12) {
+            targetMonth = 0;
+            ++targetYear;
+          }
+        }
+
+        // TODO: Add the cron job.
+      }
+    }
+  }
+}
+
+// If groups is undefined, it is assumed that people is a list of
+// phone numbers instead of a list of person IDs to look up.
+CommandCenterController._doTwilioCall = function(message, people, groups) {
+  var numbers = null;
+  if (typeof groups == 'undefined') {
+    numbers = people;
+  }
+  // TODO: finish me.
+}
+
 CommandCenterController.newSchedule = function() {
+  this.type = 'schedule';
   this.title = 'Schedule a call or text';
+
+  var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday',
+              'Thursday', 'Friday', 'Saturday'];
+  var today = new Date().getDay();
+
+  days = days.splice(today, days.length - today).concat(days);
+  days.push('Next ' + days[0]);
+  days[0] += ' (today)';
+  this.days = days;
+  this.vars = this._getScheduleVars();
+  this.vars.recipients = this._getRecipientArrays(this.vars.recipient);
+  this.vars.days = [false, false, false, false, false, false, false, false];
+  if (this.vars.message) {
+    this.vars.message = this.vars.message
+      .replace(/(["'\\])/g, '\\$1')
+      .replace(/\r?\n/g, '\\n');
+  }
+  if (this.vars.time) {
+    this.vars.time = this.vars.time
+      .replace(/(["'\\])/g, '\\$1')
+      .replace(/\r?\n/g, '\\n');
+  }
+  for (var i = 0; i < this.vars.days.length; ++i) {
+    if (this.vars['day' + i]) {
+      this.vars.days[i] = true;
+    }
+  }
+  this.newMessage();
+}
+
+CommandCenterController.scheduleError = function() {
+  this.title = 'Schedule error';
+  this.info = this.param('info') || '';
+  this.redirurl = '/command_center/schedule/new?' +
+    this._getScheduleVarString(this._getScheduleVars());
   this.render();
+}
+
+CommandCenterController.submitSchedule = function() {
+  var vars = this._getScheduleVars();
+  var error = null;
+  var hrs, mins;
+  var days = [];
+  do {
+    // Is the time valid?
+    var timematch =
+      /^(10|11|12|[1-9])(?::([0-5]\d))?\s*([AaPp][Mm])$/
+      .exec(vars.time);
+    if (!timematch) {
+      error = 'Time should be in the format HH:MM AM/PM.';
+      break;
+    }
+    // convert matched info to 24-hour format hours and minutes.
+    hrs = +timematch[1];
+    mins = +timematch[2] || 0;
+    if (hrs == 12) {
+      hrs = 0;
+    }
+    if (timematch[3][0] == 'P' || timematch[3][0] == 'p') {
+      hrs += 12;
+    }
+    // If we've picked today, make sure the time hasn't passed already.
+    // Known issue: if you leave the page overnight and then submit,
+    // the dates you see will be a day behind the ones entered into
+    // the schedule.
+    if (typeof vars.day0 != 'undefined') {
+      var now = new Date();
+      if (now.getHours() >= hrs) {
+        if (now.getHours() > hrs || now.getMinutes() >= mins) {
+          error = 'You have selected a time that has already passed.';
+          break;
+        }
+      }
+    }
+    for (var i = 0; i < 8; ++i) {
+      if (vars['day' + i]) {
+        days.push(i);
+      }
+    }
+    if (!days.length) {
+      error = 'No days were selected.';
+      break;
+    }
+  } while (false);
+
+  if (error) {
+    this.redirect('/command_center/schedule/error/?info=' + error + '&' +
+      this._getScheduleVarString(vars));
+  } else {
+    // Insert task into database and add to node-cron.
+    var self = this;
+    getPgConn(function(err, client) {
+      if (err) {
+        self.redirect('/command_center/schedule/error?info=' + error + '&' +
+          self._getScheduleVarString(vars));
+      } else {
+        // do the query
+        var recips = self._getRecipientArrays(vars.recipient);
+        var err = self._addCronJob({
+          days: days,
+          hour: hrs,
+          minute: mins,
+          type: vars.msgtype,
+          message: vars.message,
+          people: recips.people,
+          groups: recips.groups
+        });
+        if (err) {
+          self.redirect('/command_center/schedule/error?info=' + err + '&' +
+            self._getScheduleVarString(vars));
+        } else {
+          self.redirect('/command_center/schedule');
+        }
+      }
+    });
+  }
 }
 
 CommandCenterController.numbers = function() {

@@ -26,9 +26,41 @@
     </div>
   </div>
 </div>
-<div><form method="post" action="/command_center/<%= type %>/send" id="form">
+<div><form method="post" action="/command_center/<%= submiturl %>" id="form">
   <textarea name="message" id="textarea" placeholder="Type your message here"></textarea>
-  <input type="submit" value="Send <%= type %>!"></input>
+  <% if (type == 'schedule') { %>
+    <div class="margin">
+      <div class="right-half-borderless">
+        <div class="right-half-borderless">
+          <label><input type="checkbox" id="day3" name="day3"></input><%= days[3] %></label><br>
+          <label><input type="checkbox" id="day7" name="day7"></input><%= days[7] %></label>
+        </div>
+        <div class="left-half-borderless">
+          <label><input type="checkbox" id="day2" name="day2"></input><%= days[2] %></label><br>
+          <label><input type="checkbox" id="day6" name="day6"></input><%= days[6] %></label>
+        </div>
+      </div>
+      <div class="left-half-borderless">
+        <div class="right-half-borderless">
+          <label><input type="checkbox" id="day1" name="day1"></input><%= days[1] %></label><br>
+          <label><input type="checkbox" id="day5" name="day5"></input><%= days[5] %></label>
+        </div>
+        <div class="left-half-borderless">
+          <label><input type="checkbox" id="day0" name="day0"></input><%= days[0] %></label><br>
+          <label><input type="checkbox" id="day4" name="day4"></input><%= days[4] %></label>
+        </div>
+      </div>
+    </div>
+    <div class="margin">
+      <label>Time: <input type="text" id="time" name="time" value="3:00 PM"></input></label>
+      <span id="timewarning" style="display: none;">Invalid time. Please use the format HH(:MM) AM/PM</span>
+    </div>
+    <label><input type="radio" id="texttype" name="msgtype" value="Text" checked="checked"></input>Text</label>
+    <label><input type="radio" id="calltype" name="msgtype" value="Call"></input>Call</label>&nbsp;
+    <input type="submit" value="Schedule task!"></input>
+  <% } else { %>
+    <input type="submit" value="Send <%= type %>!"></input>
+  <% } %>
 </form></div>
 <script>
   $(function() {
@@ -43,20 +75,19 @@
       }
     });
 
-    $('p.recip.out').click(function() {
+    function addRecip(elem) {
       var recips = $('#recipients');
       var form = $('#form');
-      var me = $(this);
-      me.hide();
+      elem.hide();
       var p = $('<p/>', {
         class: 'recip in',
-        text: me.text(),
-        'data-id': me.data('id'),
-        'data-type': me.data('type')
+        text: elem.text(),
+        'data-id': elem.data('id'),
+        'data-type': elem.data('type')
       });
       p.click(function() {
-        $('#' + me.data('type') + me.data('id')).remove();
-        me.show();
+        $('#' + elem.data('type') + elem.data('id')).remove();
+        elem.show();
         p.remove();
         if (!$('#recipients p').length) {
           $('#recipients').text('(Empty)');
@@ -68,10 +99,65 @@
       recips.append(p);
       form.append($('<input/>', {
         type: 'hidden',
-        id: me.data('type') + me.data('id'),
+        id: elem.data('type') + elem.data('id'),
         name: 'recipient',
-        value: me.data('type') + me.data('id')
+        value: elem.data('type') + elem.data('id')
       }));
+    }
+
+    $('p.recip.out').click(function() {
+      addRecip($(this));
     });
+
+    <% if (type == 'schedule') { %>
+      // The scheduler takes up a lot of space, so collapse the
+      // recipient list by default.
+      $('#recipient-selector').hide();
+      $('#expand-recipient-list').html('&#9658; Recipients');
+
+      // Probably should have done all of this in the HTML above but whatever.
+      <% if (vars.message) { %>
+        $('#textarea').text('<%= vars.message %>');
+      <% } %>
+      <% if (vars.recipients) { %>
+        <% for (var i = 0; i < vars.recipients.people.length; ++i) { %>
+          addRecip($('#rperson<%= vars.recipients.people[i] %>'));
+        <% } %>
+        <% for (var i = 0; i < vars.recipients.groups.length; ++i) { %>
+          addRecip($('#rgroup<%= vars.recipients.groups[i] %>'));
+        <% } %>
+      <% } %>
+      <% if (vars.days) { %>
+        <% for (var i = 0; i < vars.days.length; ++i) { %>
+          <% if (vars.days[i]) { %>
+            $('#day<%= i %>').attr('checked', 'checked');
+          <% } %>
+        <% } %>
+      <% } %>
+      <% if (vars.time) { %>
+        $('#time').val('<%= vars.time %>');
+        validateTime($('#time'));
+      <% } %>
+      <% if (vars.msgtype == 'Call') { %>
+        $('#calltype').attr('checked', 'checked');
+      <% } %>
+
+      $('#time').keyup(function(e) {
+        validateTime($('#time'));
+      });
+
+      function validateTime(t) {
+        var match = 
+          /^(10|11|12|[1-9])(?::([0-5]\d))?\s*([AaPp][Mm])$/
+          .test(t.val());
+        if (!match) {
+          $('#time').css('background-color', '#ffaaaa');
+          $('#timewarning').show();
+        } else {
+          $('#time').css('background-color', '#ffffff');
+          $('#timewarning').hide();
+        }
+      }
+    <% } %>
   });
 </script>

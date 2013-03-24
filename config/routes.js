@@ -23,6 +23,9 @@ module.exports = function routes() {
   this.match('command_center/call/send', 'command_center#send_call',
     { via: 'POST' });
   this.match('command_center/schedule/new', 'command_center#new_schedule');
+  this.match('command_center/schedule/error', 'command_center#schedule_error');
+  this.match('command_center/schedule/submit', 'command_center#submit_schedule',
+    { via: 'POST' });
   this.match('command_center/schedule', 'command_center#schedule');
 
   this.match('command_center/numbers', 'command_center#numbers');
