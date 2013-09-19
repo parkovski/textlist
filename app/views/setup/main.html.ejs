@@ -1,12 +1,12 @@
 <% layout('/layout') -%>
 <p>Welcome to setup.</p>
 <form method="post" action="/setup/finish">
-  DB host: <input type="text" name="dbhost"></input><br>
-  DB user: <input type="text" name="dbuser"></input><br>
-  DB password: <input type="text" name="dbpass"></input><br>
-  DB name: <input type="text" name="dbname"></input><br>
-  twilio key: <input type="text" name="twiliokey"></input><br>
-  twilio secret: <input type="text" name="twiliosecret"></input><br>
-  twilio phone: <input type="text" name="twiliophone"></input><br>
+  DB host: <input type="text" name="dbhost"<%- getvar('dbhost') %>></input><br>
+  DB user: <input type="text" name="dbuser"<%- getvar('dbuser') %>></input><br>
+  DB password: <input type="text" name="dbpass"<%- getvar('dbpass') %>></input><br>
+  DB name: <input type="text" name="dbname"<%- getvar('dbname') %>></input><br>
+  twilio key: <input type="text" name="twiliokey"<%- getvar('twiliokey') %>></input><br>
+  twilio secret: <input type="text" name="twiliosecret"<%- getvar('twiliosecret') %>></input><br>
+  twilio phone: <input type="text" name="twiliophone"<%- getvar('twiliophone') %>></input><br>
   <input type="submit"></input>
 </form>

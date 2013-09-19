@@ -81,7 +81,7 @@
       elem.hide();
       var p = $('<p/>', {
         class: 'recip in',
-        text: elem.text(),
+        text: elem[0].innerText,
         'data-id': elem.data('id'),
         'data-type': elem.data('type')
       });

@@ -2,7 +2,8 @@ var locomotive = require('locomotive')
   , Controller = locomotive.Controller
   , pg = require('pg')
   , async = require('async')
-  , time = require('time');
+  , time = require('time')
+  , twilio = require('twilio');
 
 var settings = null;
 try {
@@ -17,7 +18,7 @@ function getPgConn(callback) {
     return;
   }
 
-  var connStr = 'tcp://' + settings.dbuser + ':' +
+  var connStr = 'postgres://' + settings.dbuser + ':' +
     settings.dbpass + '@' + settings.dbhost + '/' + settings.dbname;
 
   pg.connect(connStr, function(err, client, done) {
@@ -59,28 +60,32 @@ CommandCenterController.error = function() {
 CommandCenterController.newMessage = function() {
   var self = this;
   getPgConn(function(err, client) {
-    var q1 = 'SELECT * FROM groups;';
-    var q2 = 'SELECT * FROM people;';
-    async.map([q1, q2], function(item, callback) {
-      client.query(item, callback);
-    }, function(err, results) {
-      if (err) {
-        self.redirect('/command_center/error?info=' + err);
-      } else {
-        if (!self.title) {
-          self.title = 'New ' + self.type;
-        }
-        if (self.type == 'schedule') {
-          self.submiturl = 'schedule/submit';
+    if (err) {
+      self.redirect('/command_center/error?info=' + err);
+    } else {
+      var q1 = 'SELECT * FROM groups;';
+      var q2 = 'SELECT * FROM people;';
+      async.map([q1, q2], function(item, callback) {
+        client.query(item, callback);
+      }, function(err, results) {
+        if (err) {
+          self.redirect('/command_center/error?info=' + err);
         } else {
-          self.submiturl = self.type + '/send';
+          if (!self.title) {
+            self.title = 'New ' + self.type;
+          }
+          if (self.type == 'schedule') {
+            self.submiturl = 'schedule/submit';
+          } else {
+            self.submiturl = self.type + '/send';
+          }
+          self.jquery = true;
+          self.groups = results[0].rows;
+          self.people = results[1].rows;
+          self.render('new_message');
         }
-        self.jquery = true;
-        self.groups = results[0].rows;
-        self.people = results[1].rows;
-        self.render('new_message');
-      }
-    });
+      });
+    }
   });
 }
 
@@ -158,12 +163,11 @@ CommandCenterController.sendMessage = function() {
           if (err) {
             self.redirect('/command_center/error?info=' + err);
           } else {
-            // TODO: do the twilio call...
             var nrs = [];
             for (var i = 0; i < result.rows.length; ++i) {
               nrs.push(result.rows[i].phonenr);
             }
-            self._doTwilioCall(message, nrs);
+            self._doTwilioCall(message, nrs, self.type);
             self.redirect('/command_center');
           }
         });
@@ -285,17 +289,27 @@ CommandCenterController._addCronJob = function(vars) {
         // TODO: Add the cron job.
       }
     }
-  }
+  });
 }
 
-// If groups is undefined, it is assumed that people is a list of
-// phone numbers instead of a list of person IDs to look up.
-CommandCenterController._doTwilioCall = function(message, people, groups) {
-  var numbers = null;
-  if (typeof groups == 'undefined') {
-    numbers = people;
-  }
+CommandCenterController._doTwilioCall = function(message, numbers, type) {
   // TODO: finish me.
+  var client = new twilio.RestClient(settings.twiliokey, settings.twiliosecret);
+
+  var verb = 'sendSms';
+  if (type === 'call') verb = 'makeCall';
+
+  var self = this;
+
+  client[verb]({
+    to: numbers[0],
+    from: settings.twiliophone,
+    body: message
+  }, function(err, sentMessage) {
+    if (err) {
+      console.log(err);
+    }
+  });
 }
 
 CommandCenterController.newSchedule = function() {
